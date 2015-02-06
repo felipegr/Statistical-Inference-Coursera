@@ -1,0 +1,39 @@
+---
+title: "Statistical Inference Project - ToothGrowth analysis"
+author: "Felipe Godoi Rosario"  
+output: html_document
+---
+---
+### Overview  
+
+In this report I will analyse the ToothGrowth dataset.  
+  
+The ToothGrowth dataset is  made of 60 observations. According to the description of the dataset, these observations map 6 groups of 10 guinea pigs, which for each group there were a dose level of Vitamin C administrated and a delivery method. From the dataset description, *"the response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid)"*.  
+
+The following plot resumes the dataset:
+
+```{r results='markup', echo=FALSE}
+require(graphics)
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth, xlab = "ToothGrowth data: length vs dose, given type of supplement")
+```
+  
+### Comparing tooth groth
+
+I will compare the tooth growth by delivery method (variable *supp*) and dose level (variable *dose*). To do this I'll test if the means for OJ and for VC are equal and test for the lower and higher dose if the means are equal. I'll do this by making T tests, since the sample size is very small (10). Let's consider our alpha as 0.5. Our null hypothesis is that there's no difference in tooth growth between delivery methods and between dose levels.
+
+So for the first test (by delivery method):  
+
+```{r}
+t.test(ToothGrowth$len ~ ToothGrowth$supp, paired=FALSE, var.equal = FALSE)
+```
+
+As the p value is greater than our alpha we fail to reject our null hypothesis, so we conclude there's no difference in tooth growth between delivery methods.
+
+For the second test:
+
+```{r}
+group <- subset(ToothGrowth, ToothGrowth$dose %in% c(0.5,2.0))
+t.test(group$len ~ group$dose, paired=FALSE, var.equal = FALSE)
+```
+
+As the p value is very small we reject the null hypothesis and conclude that there is a difference in tooth growth between Vitamin C dose levels.

@@ -1,0 +1,102 @@
+---
+title: "Statistical Inference Project - Exponential Distribution and the CLT"
+author: "Felipe Godoi Rosario"  
+output: html_document
+---
+---
+### Overview  
+
+In this report I will investigate the exponential distribution and compare it with the Central Limit Theorem.  
+  
+The Central Limit Theorem (CLT) is one of the most important theorems in statistics. It states that the distribution of averages of *iid* variables (properly normalized) becomes that of a standard normal as the sample size increases.  
+  
+The comparisson will be made between the distribution of averages of 40 exponentials (doing a thousand simulations) and the exponential distribution. The mean of the exponential distribution is 1/lambda and the standard deviation is also 1/lambda, I'll use a fixed lambda = 0.2 for all simulations.  
+  
+### Sample Mean versus Theoretical Mean  
+
+The theoretical mean of the exponential distribution is 1/lambda. As our lambda = 0.2, our theoretical mean is:
+
+```{r results='markup'}
+tm <- 1/0.2
+```
+```{r echo=FALSE}
+tm
+```
+
+If we calculate the mean of a simulated exponential distribution of 1,000 cases we'll see that it's very close to 5:
+
+```{r results='markup'}
+set.seed(10)
+mean(rexp(1000,0.2))
+```
+
+Now let's simulate 1,000 averages of 40 exponentials, find the mean of the distribution of these averages and compare to the theoretical mean:
+
+```{r results='markup'}
+set.seed(10)
+vmeans <- NULL
+for (i in 1 : 1000) vmeans = c(vmeans, mean(rexp(40,0.2)))
+mean(vmeans)
+```
+
+As we can see, the two means are nearly equal. The following plots show the exponential distribution, the sample of averages distribution and their means, for comparisson. The theoretical mean is colored in red and the sample mean, blue:
+
+```{r, echo=FALSE}
+set.seed(10)
+
+tm <- mean(rexp(1000,0.2))
+
+vmeans <- NULL
+for (i in 1 : 1000) vmeans = c(vmeans, mean(rexp(40,0.2)))
+sm <- mean(vmeans)
+
+par(mfcol=c(1,2))
+hist(rexp(1000,0.2), main = "Theoretical", xlab = "", ylab = "", )
+abline(v=tm, col="red")
+abline(v=sm, col="blue")
+hist(vmeans, main = "Sample", xlab = "", ylab = "")
+abline(v=tm, col="red")
+abline(v=sm, col="blue")
+```
+
+The variances, on the other hand, are going to be different. The variance of the distribution of averages, if normalized, must be close to 1. The following code shows this is true:
+
+```{r}
+set.seed(10)
+var(rexp(1000,0.2))
+
+set.seed(10)
+vnmeans <- NULL
+for (i in 1 : 1000) vnmeans = c(vnmeans, ((mean(rexp(40,0.2))-(1/0.2))/((1/0.2)/sqrt(40))))
+var(vnmeans)
+```
+
+
+Finally, to show that the distribution of averages is approximately Normal, let's simulate a standard Normal distribution, calculate its mean and variance and compare with the distribution of averages from above.
+
+```{r}
+set.seed(10)
+mean(rnorm(1000))
+var(rnorm(1000,1))
+
+set.seed(10)
+vnmeans <- NULL
+for (i in 1 : 1000) vnmeans = c(vnmeans, ((mean(rexp(40,0.2))-(1/0.2))/((1/0.2)/sqrt(40))))
+mean(vnmeans)
+var(vnmeans)
+```
+
+We can see that the values are very close to each other. The histograms of the 2 distributions are very similar, too:
+
+```{r, echo=FALSE}
+set.seed(10)
+
+vnorm <- rnorm(1000)
+
+vnmeans <- NULL
+for (i in 1 : 1000) vnmeans = c(vnmeans, ((mean(rexp(40,0.2))-(1/0.2))/((1/0.2)/sqrt(40))))
+
+par(mfcol=c(1,2))
+hist(vnorm, main = "Normal", xlab = "", ylab = "")
+hist(vnmeans, main = "Averages", xlab = "", ylab = "")
+```
